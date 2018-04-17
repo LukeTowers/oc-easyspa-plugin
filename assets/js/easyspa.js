@@ -3,7 +3,7 @@
  *
  * Data attributes:
  * - data-control="quick-page-loader" - enables the plugin on an element
- * - data-refresh-partials="partial-path:#partial-selector,other-partial-path:#other-partial-selector" - comma separated list of partials to update
+ * - data-refresh-partials="partial-path:#partial-selector&other-partial-path:#other-partial-selector" - ampersand separated list of partials to update
  *
  * JavaScript API:
  * $('div').easySPALoader()
@@ -31,6 +31,9 @@
     EasySPALoader.prototype.onClick = function(ev) {
         ev.preventDefault()
         var requestedUrl = $(ev.currentTarget).attr('href')
+
+        // TODO: Get the assets from the current page and the assets from the new page,
+        // remove any changed old ones and add any changed new ones
 
         $.request('onGetPage', {
             data: {
