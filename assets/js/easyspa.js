@@ -2,7 +2,7 @@
  * Easy SPA Loader plugin
  *
  * Data attributes:
- * - data-control="quick-page-loader" - enables the plugin on an element
+ * - data-control="easy-spa-loader" - enables the plugin on an element
  * - data-refresh-partials="partial-path:#partial-selector&other-partial-path:#other-partial-selector" - ampersand separated list of partials to update
  *
  * JavaScript API:

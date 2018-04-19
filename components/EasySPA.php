@@ -87,8 +87,9 @@ class EasySPA extends ComponentBase
      */
     protected function getRelativeUrl($url) {
         $parts = parse_url($url);
+        $path = !empty($parts['path']) ? $parts['path'] : '/';
         $query = !empty($parts['query']) ? '?' . $parts['query'] : '';
 
-        return $parts['path'] . $query;
+        return $path . $query;
     }
 }

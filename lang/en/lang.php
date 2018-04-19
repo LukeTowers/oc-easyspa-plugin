@@ -6,8 +6,8 @@
 
     'components' => [
         'easyspa' => [
-            'name'        => '',
-            'description' => '',
+            'name'        => 'Single Page Application Loader',
+            'description' => 'Required to enable dynamic page loading',
         ]
     ]
 ];
