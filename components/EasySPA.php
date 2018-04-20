@@ -27,12 +27,14 @@ class EasySPA extends ComponentBase
 
     public function onGetPage()
     {
-        // Get the current page's assets
-        $currentAssets = $this->controller->getAssetPaths();
-
         // Remove the AJAX handler from the request to prevent an infinite loop
         request()->headers->remove('X_OCTOBER_REQUEST_HANDLER');
         request()->headers->remove('X-Requested-With');
+
+        // Get the current page's assets
+        $this->controller->run(null);
+        $currentAssets = $this->controller->getAssetPaths();
+        $this->controller->flushAssets();
 
         // Render the requested page
         $url = $this->getRelativeUrl(input('url'));
