@@ -4,7 +4,6 @@
     "description": "Adds Single Page Application like features to the OctoberCMS frontend using the OctoberCMS AJAX framework",
     "homepage": "https://github.com/LukeTowers/oc-easyspa-plugin",
     "keywords": ["october", "octobercms", "spa", "single page application", "ajax"],
-    "license": "Proprietary",
     "authors": [
         {
             "name": "Luke Towers",
