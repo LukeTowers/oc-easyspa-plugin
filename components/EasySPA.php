@@ -17,7 +17,8 @@ class EasySPA extends ComponentBase
     {
         // Do required initial work only if this isn't a request to load a page
         if (Request::header('X_OCTOBER_REQUEST_HANDLER') !== 'onGetPage') {
-            $this->addJs('/plugins/luketowers/easyspa/assets/js/easyspa.js');
+            $this->assetPath = plugins_path('luketowers/easyspa/assets');
+            $this->addJs(['js/assetmanager.js', 'js/easyspa.js']);
 
             $this->controller->bindEvent('page.render', function ($contents) {
                 return '<div id="easyspa-container">' . $contents . '</div>';
@@ -35,6 +36,8 @@ class EasySPA extends ComponentBase
         $this->controller->run(null);
         $currentAssets = $this->controller->getAssetPaths();
         $this->controller->flushAssets();
+        // Ignore the issues that may exist on the current page
+        $this->controller->setStatusCode(200);
 
         // Render the requested page
         $url = $this->getRelativeUrl(input('url'));
