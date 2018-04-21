@@ -29,9 +29,14 @@
     }
 
     EasySPALoader.prototype.onClick = function(ev) {
+        // Check to see if this is a link to the same
+        // website before proceeding
+        if (ev.currentTarget.host !== window.location.host) {
+            return;
+        }
         ev.preventDefault()
-        var requestedUrl = $(ev.currentTarget).attr('href')
 
+        var requestedUrl = $(ev.currentTarget).attr('href')
         $.request('onGetPage', {
             data: {
                 url: requestedUrl,
@@ -48,6 +53,7 @@
         window.spaAssetManager.add(assets.add, $.proxy(function (assetsToRemove, newUrl) {
             window.spaAssetManager.remove(assetsToRemove, $.proxy(function () {
                 window.history.pushState({}, '', newUrl)
+                window.scrollTo(0, 0)
             }), null)
         }, this, assets.remove, this.options.data.url))
     }

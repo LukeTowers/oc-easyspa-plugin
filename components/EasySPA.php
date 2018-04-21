@@ -13,6 +13,14 @@ class EasySPA extends ComponentBase
         ];
     }
 
+    public function init()
+    {
+        // dd($this);
+        // \App::extend(LaravelRequest::class, function ($request, $app) {
+        //     return new Request;
+        // });
+    }
+
     public function onRun()
     {
         // Do required initial work only if this isn't a request to load a page
@@ -28,9 +36,10 @@ class EasySPA extends ComponentBase
 
     public function onGetPage()
     {
+        $request = request();
         // Remove the AJAX handler from the request to prevent an infinite loop
-        request()->headers->remove('X_OCTOBER_REQUEST_HANDLER');
-        request()->headers->remove('X-Requested-With');
+        $request->headers->remove('X_OCTOBER_REQUEST_HANDLER');
+        $request->headers->remove('X-Requested-With');
 
         // Get the current page's assets
         $this->controller->run(null);
@@ -41,6 +50,30 @@ class EasySPA extends ComponentBase
 
         // Render the requested page
         $url = $this->getRelativeUrl(input('url'));
+
+        // This is ridiculous... All this to simply reset the Request::path() call
+        // for the StaticMenu component to have the correct active menu item by
+        // setting the request url midway through the request to the page requested
+        // over AJAX
+        $setRequestUrl = \Closure::bind(function ($url) {
+            $this->requestUri = null;
+            $this->pathInfo = null;
+            $this->headers->set('X_ORIGINAL_URL', $url);
+        }, $request, $request);
+        $setRequestUrl($url);
+
+        // Reflection API approach to above
+        // $reflectionClass = new \ReflectionClass(get_class($request));
+        // $propertiesToNull = [
+        //     $reflectionClass->getProperty('requestUri'),
+        //     $reflectionClass->getProperty('pathInfo'),
+        // ];
+        // foreach ($propertiesToNull as $property) {
+        //     $property->setAccessible(true);
+        //     $property->setValue(request(), null);
+        // }
+        // $request->headers->set('X_ORIGINAL_URL', $url);
+
         $this->controller->run($url);
         $pageContents = $this->controller->renderPage();
 
