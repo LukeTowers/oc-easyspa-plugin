@@ -13,14 +13,6 @@ class EasySPA extends ComponentBase
         ];
     }
 
-    public function init()
-    {
-        // dd($this);
-        // \App::extend(LaravelRequest::class, function ($request, $app) {
-        //     return new Request;
-        // });
-    }
-
     public function onRun()
     {
         // Do required initial work only if this isn't a request to load a page
