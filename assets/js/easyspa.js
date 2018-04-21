@@ -31,7 +31,7 @@
     EasySPALoader.prototype.onClick = function(ev) {
         // Check to see if this is a link to the same
         // website before proceeding
-        if (ev.currentTarget.host !== window.location.host) {
+        if (ev.currentTarget.host !== window.location.host || ev.currentTarget.indexOf("#") != -1) {
             return;
         }
         ev.preventDefault()
