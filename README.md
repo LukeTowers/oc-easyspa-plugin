@@ -22,7 +22,7 @@ To install it with Composer, run `composer require luketowers/oc-easyspa-plugin`
 
 # Usage
 
-To use this plugin, simply attach the `[easySPA]` component to any layouts that you want to be able to have their pages loaded over AJAX. The loader needs to be attached to an element on the page that contains anchor tags with the URLs to the pages that are to be loaded. This is done by adding the `data-controler="easy-spa-loader"` attribute onto the containing element. There is also an optional attribute `data-refresh-partials` that can be used to define additional partials that should be refreshed when the page is load in the form of `partialPath1:#partialSelector1` with additional partials appended with an `&` symbol.
+To use this plugin, simply attach the `[easySPA]` component to any layouts that you want to be able to have their pages loaded over AJAX. The loader needs to be attached to an element on the page that contains anchor tags with the URLs to the pages that are to be loaded. This is done by adding the `data-control="easy-spa-loader"` attribute onto the containing element. There is also an optional attribute `data-refresh-partials` that can be used to define additional partials that should be refreshed when the page is load in the form of `partialPath1:#partialSelector1` with additional partials appended with an `&` symbol.
 
 Example Layout:
 
