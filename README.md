@@ -34,8 +34,8 @@ description="Default layout"
     <head>
         ...
     </head>
-    <body>
-        <header id="site-header" data-control="easy-spa-loader" data-refresh-partials="site/header:#site-header">
+    <body data-control="easy-spa-loader" data-refresh-partials="site/header:#site-header">
+        <header id="site-header">
             {% partial 'site/header' %}
         </header>
 
