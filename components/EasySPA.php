@@ -18,7 +18,7 @@ class EasySPA extends ComponentBase
         // Do required initial work only if this isn't a request to load a page
         if (Request::header('X_OCTOBER_REQUEST_HANDLER') !== 'onGetPage') {
             $this->assetPath = plugins_path('luketowers/easyspa/assets');
-            $this->addJs(['js/assetmanager.js', 'js/easyspa.js']);
+            $this->addJs(['js/statemanager.js', 'js/assetmanager.js', 'js/easyspa.js']);
 
             $this->controller->bindEvent('page.render', function ($contents) {
                 return '<div id="easyspa-container">' . $contents . '</div>';
@@ -66,7 +66,7 @@ class EasySPA extends ComponentBase
         // }
         // $request->headers->set('X_ORIGINAL_URL', $url);
 
-        $this->controller->run($url);
+        $fullResult = $this->controller->run($url);
         $pageContents = $this->controller->renderPage();
 
         // Render the partials to be updated
@@ -82,6 +82,7 @@ class EasySPA extends ComponentBase
         // Return the contents
         return array_merge($partials, [
             '#easyspa-container' => $pageContents,
+            'X_EASYSPA_RENDERED_TITLE' => $this->getHtmlTitle($fullResult),
             'X_EASYSPA_CHANGED_ASSETS' => json_encode($this->getChangedAssets($currentAssets, $this->controller->getAssetPaths())),
         ]);
     }
@@ -121,5 +122,23 @@ class EasySPA extends ComponentBase
         $query = !empty($parts['query']) ? '?' . $parts['query'] : '';
 
         return $path . $query;
+    }
+
+    /**
+     * Get an HTML document's title using regex
+     *
+     * @param string $html The HTML to attempt to parse
+     * @return string $title The retrieved title if found, false if none found
+     */
+    protected function getHtmlTitle($html)
+    {
+        $title = false;
+
+        $matches = [];
+        if (preg_match('/<.*title.*>(.*?)<\/title>/', $html, $matches)) {
+            $title = trim($matches[1]);
+        }
+
+        return $title;
     }
 }
