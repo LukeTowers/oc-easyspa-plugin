@@ -26,6 +26,11 @@ class EasySPA extends ComponentBase
         }
     }
 
+    /**
+     * Handle an AJAX request for a page
+     *
+     * @return array
+     */
     public function onGetPage()
     {
         $request = request();
@@ -33,10 +38,16 @@ class EasySPA extends ComponentBase
         $request->headers->remove('X_OCTOBER_REQUEST_HANDLER');
         $request->headers->remove('X-Requested-With');
 
-        // Get the current page's assets
+        // Run the current page to collect information for comparisons
         $this->controller->run(null);
+
+        // Get the layout of the source page (can be empty)
+        $originalLayout = @$this->controller->getPage()->settings['layout'];
+
+        // Get the current page's assets
         $currentAssets = $this->controller->getAssetPaths();
         $this->controller->flushAssets();
+
         // Ignore the issues that may exist on the current page
         $this->controller->setStatusCode(200);
 
@@ -66,25 +77,41 @@ class EasySPA extends ComponentBase
         // }
         // $request->headers->set('X_ORIGINAL_URL', $url);
 
-        $fullResult = $this->controller->run($url);
-        $pageContents = $this->controller->renderPage();
+        // Render the full page result
+        $fullResult = $this->controller->run($url)->content();
 
-        // Render the partials to be updated
-        $partials = [];
-        if (!empty(input('refreshPartials'))) {
-            $refreshPartials = explode('&', input('refreshPartials'));
-            foreach ($refreshPartials as $partial) {
-                list($partialPath, $selector) = explode(':', $partial);
-                $partials[$selector] = $this->controller->renderPartial($partialPath);
-            }
+        // Get the layout of the target page
+        $newLayout = @$this->controller->getPage()->settings['layout'];
+
+        // Render just the page contents if the source and target pages use the same layouts
+        $pageContents = false;
+        if ($newLayout === $originalLayout) {
+            $pageContents = $this->controller->renderPage();
         }
 
-        // Return the contents
-        return array_merge($partials, [
-            '#easyspa-container' => $pageContents,
+        $result = [
             'X_EASYSPA_RENDERED_TITLE' => $this->getHtmlTitle($fullResult),
-            'X_EASYSPA_CHANGED_ASSETS' => json_encode($this->getChangedAssets($currentAssets, $this->controller->getAssetPaths())),
-        ]);
+        ];
+        if ($pageContents) {
+            // Render the partials to be updated
+            $partials = [];
+            if (!empty(input('refreshPartials'))) {
+                $refreshPartials = explode('&', input('refreshPartials'));
+                foreach ($refreshPartials as $partial) {
+                    list($partialPath, $selector) = explode(':', $partial);
+                    $partials[$selector] = $this->controller->renderPartial($partialPath);
+                }
+            }
+
+            $result = array_merge($result, $partials, [
+                '#easyspa-container' => $pageContents,
+                'X_EASYSPA_CHANGED_ASSETS' => json_encode($this->getChangedAssets($currentAssets, $this->controller->getAssetPaths())),
+            ]);
+        } else {
+            $result['X_EASYSPA_RENDERED_CONTENTS'] = $fullResult;
+        }
+
+        return $result;
     }
 
     /**

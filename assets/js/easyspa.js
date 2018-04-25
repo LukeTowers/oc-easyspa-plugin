@@ -9,6 +9,14 @@
  * $('div').easySPALoader()
  */
 
+jQuery(document).ready(function ($) {
+    $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
+        jqXHR.originalRequest = {
+            context: options.context
+        }
+    })
+})
+
 +function ($) { "use strict";
 
     // EASY SPA LOADER CLASS DEFINITION
@@ -60,7 +68,7 @@
         }
         ev.preventDefault()
 
-        this.loadUrl($(ev.currentTarget).attr('href'))
+        $.proxy(this.loadUrl, this)($(ev.currentTarget).attr('href'))
     }
 
     EasySPALoader.prototype.loadUrl = function (url, skipStateChange) {
@@ -82,39 +90,66 @@
                 refreshPartials: this.options.refreshPartials
             },
             loading: $.oc.stripeLoadIndicator,
-            beforeUpdate: this.beforeUpdate,
+            beforeUpdate: $.proxy(this.beforeUpdate, this),
             handleErrorMessage: this.handleErrorMessage
         })
     }
 
+    EasySPALoader.prototype.updateHistory = function (url, title) {
+        console.log('update history', url, title)
+
+        // Check to see if we should update the state or not
+        var skipStateChangeKey = url + '-skipStateChange'
+        if (window.spaState.getData(skipStateChangeKey)) {
+            window.spaState.setData(skipStateChangeKey, false)
+        } else {
+            window.history.pushState({}, title, url)
+        }
+
+        // Update the document title if required
+        if (title) {
+            document.title = title
+        }
+
+        // Update the current url
+        window.spaState.setData('currentUrl', url)
+        window.scrollTo(0, 0)
+    }
+
     // Handle updating the history as required
     EasySPALoader.prototype.beforeUpdate = function (data, status, jqXHR) {
+        var title = data.X_EASYSPA_RENDERED_TITLE,
+            url = jqXHR.originalRequest.context.options.data.url
+
+        // Short circuit if the full rendered page is provided instead of just the page container
+        if (data.X_EASYSPA_RENDERED_CONTENTS) {
+            this.updateHistory(url, title)
+            document.open('text/html', 'replace')
+            document.write(data.X_EASYSPA_RENDERED_CONTENTS)
+            $(document.body).append($.oc.stripeLoadIndicator.indicator)
+            // $(document).trigger('render')
+            return
+        }
+
         var assets = JSON.parse(data.X_EASYSPA_CHANGED_ASSETS)
 
         // Add any assets as required
-        window.spaAssetManager.add(assets.add, $.proxy(function (assetsToRemove, newUrl, newTitle) {
-
-            // Remove any assets as required
-            window.spaAssetManager.remove(assetsToRemove, $.proxy(function () {
-
-                // Check to see if we should update the state or not
-                var skipStateChangeKey = newUrl + '-skipStateChange'
-                if (window.spaState.getData(skipStateChangeKey)) {
-                    window.spaState.setData(skipStateChangeKey, false)
-                } else {
-                    window.history.pushState({}, newTitle, newUrl)
-                }
-
-                // Update the document title if required
-                if (newTitle) {
-                    document.title = newTitle
-                }
-
-                // Update the current url
-                window.spaState.setData('currentUrl', newUrl)
-                window.scrollTo(0, 0)
-            }), null)
-        }, this, assets.remove, this.options.data.url, data.X_EASYSPA_RENDERED_TITLE))
+        window.spaAssetManager.add(
+            assets.add,
+            $.proxy(
+                function (assetsToRemove, newUrl, newTitle) {
+                    // Remove any assets as required and update the history
+                    window.spaAssetManager.remove(
+                        assetsToRemove,
+                        $.proxy(this.updateHistory, this, newUrl, newTitle)
+                    )
+                },
+                this,
+                assets.remove,
+                url,
+                title
+            )
+        )
     }
 
     // Handle any error messages that are returned
@@ -129,6 +164,7 @@
                 if (message.includes('easyspa-container')) {
                     $('#easyspa-container').html($('#easyspa-container', message).html())
                 } else {
+                    document.open()
                     document.write(message)
                 }
             }
