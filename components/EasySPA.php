@@ -16,8 +16,8 @@ class EasySPA extends ComponentBase
     public function defineProperties()
     {
         return [
-            'element' => [
-                'title'       => 'luketowers.easyspa::lang.components.easyspa.element_name',
+            'wrapper_id' => [
+                'title'       => 'luketowers.easyspa::lang.components.easyspa.wrapper_id',
                 'type'        => 'string',
                 'default'     => 'easyspa-container',
             ]
@@ -113,11 +113,9 @@ class EasySPA extends ComponentBase
                     $partials[$selector] = $this->controller->renderPartial($partialPath);
                 }
             }
-            
-            $elementName = $this->property('element');
 
             $result = array_merge($result, $partials, [
-                '#' . $elementName => $pageContents,
+                '#' . $this->property('wrapper_id') => $pageContents,
                 'X_EASYSPA_CHANGED_ASSETS' => json_encode($this->getChangedAssets($currentAssets, $this->controller->getAssetPaths())),
             ]);
         } else {
