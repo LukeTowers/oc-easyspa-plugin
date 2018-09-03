@@ -8,7 +8,7 @@
         'easyspa' => [
             'name'         => 'Single Page Application Loader',
             'description'  => 'Required to enable dynamic page loading',
-            'element_name' => 'Element Name'
+            'wrapper_id'   => 'Page Wrapper Element ID'
         ]
     ]
 ];
