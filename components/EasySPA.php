@@ -12,7 +12,18 @@ class EasySPA extends ComponentBase
             'description' => 'luketowers.easyspa::lang.components.easyspa.description',
         ];
     }
-
+    
+    public function defineProperties()
+    {
+        return [
+            'element' => [
+                'title'       => 'luketowers.easyspa::lang.components.easyspa.element_name',
+                'type'        => 'string',
+                'default'     => 'easyspa-container',
+            ]
+        ];
+    }
+    
     public function onRun()
     {
         // Do required initial work only if this isn't a request to load a page
@@ -21,7 +32,7 @@ class EasySPA extends ComponentBase
             $this->addJs(['js/statemanager.js', 'js/assetmanager.js', 'js/easyspa.js']);
 
             $this->controller->bindEvent('page.render', function ($contents) {
-                return '<div id="easyspa-container">' . $contents . '</div>';
+                return $contents;
             });
         }
     }
@@ -102,9 +113,11 @@ class EasySPA extends ComponentBase
                     $partials[$selector] = $this->controller->renderPartial($partialPath);
                 }
             }
+            
+            $elementName = $this->property('element');
 
             $result = array_merge($result, $partials, [
-                '#easyspa-container' => $pageContents,
+                '#' . $elementName => $pageContents,
                 'X_EASYSPA_CHANGED_ASSETS' => json_encode($this->getChangedAssets($currentAssets, $this->controller->getAssetPaths())),
             ]);
         } else {
