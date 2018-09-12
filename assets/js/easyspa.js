@@ -9,6 +9,7 @@
  * $('div').easySPALoader()
  */
 
+// noinspection BadExpressionStatementJS
 jQuery(document).ready(function ($) {
     $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
         jqXHR.originalRequest = {
@@ -65,7 +66,7 @@ jQuery(document).ready(function ($) {
         // website before proceeding
         var href = ev.currentTarget.href;
 
-        if (ev.currentTarget.host !== window.location.host || href.indexOf("#") != -1 || href.match(/\.(.*)$/i)) {
+        if (ev.currentTarget.host !== window.location.host || href.indexOf("#") !== -1 || href.match(/(\.\w+$)/igm)) {
             return;
         }
         ev.preventDefault()
