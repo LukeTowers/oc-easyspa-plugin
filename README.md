@@ -48,5 +48,5 @@ description="Default layout"
 </html>
 ```
 
-If you need custom Javascript to be called on the ajax update/success event, you need to define a javascript callback function containing this code. Once this function is defined, you can add the function name (as a string) to the updateCallback data attribute.
+If you need custom Javascript to be called on the ajax success/complete event, you need to define a javascript callback function containing this code. Once this function is defined, you can add the function name (as a string) to the updateCallback data attribute.
 See the Example Layout above on how to do this.
