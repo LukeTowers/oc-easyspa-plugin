@@ -34,7 +34,7 @@ description="Default layout"
     <head>
         ...
     </head>
-    <body data-control="easy-spa-loader" data-refresh-partials="site/header:#site-header">
+    <body data-control="easy-spa-loader" data-refresh-partials="site/header:#site-header" data-update-callback="callable_function_name">
         <header id="site-header">
             {% partial 'site/header' %}
         </header>
@@ -47,3 +47,6 @@ description="Default layout"
     </body>
 </html>
 ```
+
+If you need custom Javascript to be called on the ajax update/success event, you need to define a javascript callback function containing this code. Once this function is defined, you can add the function name (as a string) to the updateCallback data attribute.
+See the Example Layout above on how to do this.

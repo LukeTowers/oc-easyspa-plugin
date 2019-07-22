@@ -4,6 +4,7 @@
  * Data attributes:
  * - data-control="easy-spa-loader" - enables the plugin on an element
  * - data-refresh-partials="partial-path:#partial-selector&other-partial-path:#other-partial-selector" - ampersand separated list of partials to update
+ * - data-update-callback="callable_function_name" - This must be a callable function within global scope (no parameters passed)
  *
  * JavaScript API:
  * $('div').easySPALoader()
@@ -25,6 +26,8 @@ jQuery(document).ready(function ($) {
     var EasySPALoader = function(element, options) {
         this.options   = options
         this.$el       = $(element)
+        //Added this because console messages should not show in production environment
+        this.debug     = false; //Shows console messages if true
 
         // Init
         this.init()
@@ -91,12 +94,13 @@ jQuery(document).ready(function ($) {
             },
             loading: $.oc.stripeLoadIndicator,
             beforeUpdate: $.proxy(this.beforeUpdate, this),
-            handleErrorMessage: this.handleErrorMessage
+            handleErrorMessage: this.handleErrorMessage,
+            complete: $.proxy(this.afterUpdate, this)
         })
     }
 
     EasySPALoader.prototype.updateHistory = function (url, title) {
-        console.log('update history', url, title)
+        this.debug && console.log('update history', url, title);
 
         // Check to see if we should update the state or not
         var skipStateChangeKey = url + '-skipStateChange'
@@ -151,6 +155,14 @@ jQuery(document).ready(function ($) {
             )
         )
     }
+
+    EasySPALoader.prototype.afterUpdate = function (data, status) {
+        this.debug && console.log('updateCallback: ', window[this.options.updateCallback]);
+
+        // Only attempt to run callback if status is 'success' and callback is a function
+        status === 'success' && typeof window[this.options.updateCallback] === 'function' &&
+        window[this.options.updateCallback]();
+    };
 
     // Handle any error messages that are returned
     EasySPALoader.prototype.handleErrorMessage = function (message) {
