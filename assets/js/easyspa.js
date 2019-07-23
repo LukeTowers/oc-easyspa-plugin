@@ -96,7 +96,6 @@ jQuery(document).ready(function ($) {
     }
 
     EasySPALoader.prototype.updateHistory = function (url, title) {
-        console.log('update history', url, title)
 
         // Check to see if we should update the state or not
         var skipStateChangeKey = url + '-skipStateChange'
