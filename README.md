@@ -47,9 +47,9 @@ description="Default layout"
     </body>
 </html>
 ```
-# Custom Javascript Code Used In Pages
+# Use Of Third-party/Custom Javascript
 
-Since this plugin uses the Ajax framework to dynamically make changes to the DOM, not all third-party Javascript libraries/scripts may work properly when a page is updated via the ajax framework.
+Since this plugin uses the Ajax framework to dynamically make changes to the DOM, not all third-party Javascript libraries/scripts may work properly when a page is updated.
 This is because many of these scripts rely on the $(document).ready event or $(window).load which is not triggered during an ajax update. If you have scripts like this, you may need to re-instantiate some Javascript objects in your code using a $(document).render event listener.
  
 Example (with fake third-party libraries):
