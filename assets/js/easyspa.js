@@ -11,6 +11,7 @@
  * $('div').easySPALoader()
  */
 
+// noinspection BadExpressionStatementJS
 jQuery(document).ready(function ($) {
     $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
         jqXHR.originalRequest = {
@@ -80,7 +81,9 @@ jQuery(document).ready(function ($) {
     EasySPALoader.prototype.onClick = function(ev) {
         // Check to see if this is a link to the same
         // website before proceeding
-        if (ev.currentTarget.host !== window.location.host || ev.currentTarget.href.indexOf("#") != -1) {
+        var href = ev.currentTarget.href;
+
+        if (ev.currentTarget.host !== window.location.host || href.indexOf("#") !== -1 || href.match(/(\.\w+$)/igm)) {
             return;
         }
         ev.preventDefault()
@@ -95,6 +98,8 @@ jQuery(document).ready(function ($) {
             this.setData(url + '-skipStateChange', true)
         }
 
+        $(document).trigger('easySPA:beforeGetPage', [url, skipStateChange]);
+
         // Don't do anything if the requested URL is the same as the current URL
         if (url === this.getData('currentUrl')) {
             return;
@@ -108,7 +113,15 @@ jQuery(document).ready(function ($) {
             },
             loading: $.oc.stripeLoadIndicator,
             beforeUpdate: $.proxy(this.beforeUpdate, this),
-            handleErrorMessage: this.handleErrorMessage
+            handleErrorMessage: this.handleErrorMessage,
+            success: function(data, status, jqXHR) {
+                this.success(data, status, jqXHR).done(function() {
+                    $(document).trigger('easySPA:success', [data, status, jqXHR]);
+                });
+            },
+            complete: function (data, status, jqXHR) {
+                $(document).trigger('easySPA:complete', [data, status, jqXHR]);
+            }
         })
     }
 
@@ -134,6 +147,8 @@ jQuery(document).ready(function ($) {
 
     // Handle updating the history as required
     EasySPALoader.prototype.beforeUpdate = function (data, status, jqXHR) {
+        $(document).trigger('easySPA:beforeUpdate', [data, status, jqXHR]);
+
         var title = data.X_EASYSPA_RENDERED_TITLE,
             url = jqXHR.originalRequest.context.options.data.url
 
@@ -159,6 +174,7 @@ jQuery(document).ready(function ($) {
                         assetsToRemove,
                         $.proxy(this.updateHistory, this, newUrl, newTitle)
                     )
+                    $(document).trigger('easySPA:addAssets', [assets]);
                 },
                 this,
                 assets.remove,
