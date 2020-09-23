@@ -61,7 +61,8 @@ class EasySPA extends ComponentBase
         $setRequestUrl = \Closure::bind(function ($url) {
             $this->requestUri = null;
             $this->pathInfo = null;
-            $this->headers->set('X_ORIGINAL_URL', $url);
+            $this->server->set('UNENCODED_URL', $url);
+            $this->server->set('REQUEST_URI', $url);
         }, $request, $request);
         $setRequestUrl($url);
 

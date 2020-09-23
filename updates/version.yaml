@@ -3,3 +3,4 @@
 1.0.1: Added Documentation & Updated License
 1.0.2: Auto scroll to top on page load, minor bugfixes
 1.0.3: Added support for the History API (browser back and forward buttons)
+1.0.4: Fixed compatibility with Symfony\HttpFoundation >= 2.8.44

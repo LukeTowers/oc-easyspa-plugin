@@ -4,6 +4,8 @@
  * Data attributes:
  * - data-control="easy-spa-loader" - enables the plugin on an element
  * - data-refresh-partials="partial-path:#partial-selector&other-partial-path:#other-partial-selector" - ampersand separated list of partials to update
+ * - data-ignore-in-selectors="" - CSS selectors for parent elements to ignore the links for (i.e. '.external-navigation' will compile to ':not(.external-navigation) > a')
+ * - data-ignore-on-selectors="" - CSS selectors for links to ignore (i.e. '.external-link' will compile to 'a:not(.external-link)')
  *
  * JavaScript API:
  * $('div').easySPALoader()
@@ -38,7 +40,7 @@ jQuery(document).ready(function ($) {
         }
 
         // Attach the click handler to links in the specified container
-        this.$el.on('click', 'a', $.proxy(this.onClick, this))
+        this.$el.on('click', this.getLinkSelector(), $.proxy(this.onClick, this))
 
         // Only attach one popstate handler
         var popstateHandler = $.proxy(this.onStateChange, this)
@@ -46,6 +48,21 @@ jQuery(document).ready(function ($) {
             this.setData('popstateBound', true)
             $(window).bind('popstate', popstateHandler)
         }
+    }
+
+    EasySPALoader.prototype.getLinkSelector = function () {
+        var selectors = '';
+        if (this.options.igoreInSelectors) {
+            selectors = ':not(' + this.options.ignoreInSelectors + ') '
+        }
+
+        if (this.options.ignoreOnSelectors) {
+            selectors += 'a:not(' + this.options.ignoreOnSelectors + ')'
+        } else {
+            selectors += 'a'
+        }
+
+        return selectors
     }
 
     EasySPALoader.prototype.getData = function (key) {
