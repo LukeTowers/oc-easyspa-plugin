@@ -142,7 +142,8 @@ jQuery(document).ready(function ($) {
             this.updateHistory(url, title)
             document.open('text/html', 'replace')
             document.write(data.X_EASYSPA_RENDERED_CONTENTS)
-            $(document.body).append($.oc.stripeLoadIndicator.indicator)
+            document.close()
+            //$(document.body).append($.oc.stripeLoadIndicator.indicator)
             // $(document).trigger('render')
             return
         }
